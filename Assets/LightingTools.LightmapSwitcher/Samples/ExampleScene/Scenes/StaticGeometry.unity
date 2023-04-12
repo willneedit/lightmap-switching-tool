@@ -379,7 +379,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   latestBuildHasReltimeLights: 0
-  allowLoadingLightingScenes: 0
+  allowLoadingLightingScenes: 1
   applyLightmapScaleAndOffset: 1
   lightingScenariosData:
   - {fileID: 11400000, guid: 0a984ccf06ec1784f8b4640e3e5f615c, type: 2}
@@ -839,8 +839,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1709437754}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: LoadLightingScenario
+        m_TargetAssemblyTypeName: LevelLightmapData, LightingTools.LightmapSwitcher
+        m_MethodName: LoadLightingScenarioData
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1136,8 +1136,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1709437754}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: LoadLightingScenario
+        m_TargetAssemblyTypeName: LevelLightmapData, LightingTools.LightmapSwitcher
+        m_MethodName: LoadLightingScenarioData
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1392,8 +1392,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1709437754}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: LoadLightingScenario
+        m_TargetAssemblyTypeName: LevelLightmapData, LightingTools.LightmapSwitcher
+        m_MethodName: LoadLightingScenarioData
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

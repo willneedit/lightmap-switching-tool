@@ -20,27 +20,29 @@ MonoBehaviour:
     meshHash: 515
     name: Sphere (1)
     lightmapIndex: 0
-    lightmapScaleOffset: {x: 0.062499978, y: 0.062499978, z: 0.796875, w: 0.1177524}
+    lightmapScaleOffset: {x: 0.33984363, y: 0.33984363, z: 0, w: 0.53113896}
   - transformHash: -842247699
     meshHash: 515
     name: Sphere
     lightmapIndex: 0
-    lightmapScaleOffset: {x: 0.062499978, y: 0.062499978, z: 0.875, w: 0.1177524}
+    lightmapScaleOffset: {x: 0.33984363, y: 0.33984363, z: 0, w: 0.75725317}
   - transformHash: -1351881472
     meshHash: 24
     name: Cube
     lightmapIndex: 0
-    lightmapScaleOffset: {x: 0.1574145, y: 0.1574145, z: 0.7962366, w: -0.0006384364}
+    lightmapScaleOffset: {x: 0.81265235, y: 0.81265235, z: -0.003295928, w: -0.003295928}
   - transformHash: 0
     meshHash: 121
     name: Plane
-    lightmapIndex: 0
-    lightmapScaleOffset: {x: 0.78125, y: 0.78125, z: 0, w: 0}
+    lightmapIndex: 1
+    lightmapScaleOffset: {x: 1, y: 1, z: 0, w: 0}
   lightmaps:
-  - {fileID: 2800000, guid: 87273c7186ded6640b9c3343382e3ac6, type: 3}
+  - {fileID: 2800000, guid: 544b3f78ad0996f42a40affbf35c9008, type: 3}
+  - {fileID: 2800000, guid: 83656d1506e8af94b949ea9b3eda9d3c, type: 3}
   lightmapsDir:
-  - {fileID: 2800000, guid: db3c96ad25602cf45a35b22b271bac5c, type: 3}
+  - {fileID: 2800000, guid: d10cb32b16fda69419fdaada05b000a0, type: 3}
+  - {fileID: 2800000, guid: 1d7a10b5164ae2d4797ec63aa369aae3, type: 3}
   shadowMasks: []
   lightmapsMode: 1
-  lightProbesAsset: {fileID: 11400000, guid: 7c70f65b46a7a3742bd8e7b24ac215be, type: 2}
+  lightProbesAsset: {fileID: 11400000, guid: a6f5817f1ccfb184890898458990fcbf, type: 2}
   hasRealtimeLights: 1
