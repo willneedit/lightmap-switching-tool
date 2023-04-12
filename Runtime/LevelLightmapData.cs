@@ -38,18 +38,58 @@ public class LevelLightmapData : MonoBehaviour
     //TODO : enable logs only when verbose enabled
     public bool verbose = false;
 
+    public void LoadLightingScenarioData(int index) => LoadLightingScenarioData(lightingScenariosData[index]);
+
     public void LoadLightingScenarioData(LightingScenarioData data)
     {
-        LightmapSettings.lightmapsMode = data.lightmapsMode;
-
-        if (data.storeRendererInfos)
+        IEnumerator ReconfigureScenes(LightingScenarioData data)
         {
-            ApplyDataRendererInfo(data.rendererInfos);
+            bool usePlaymodeSwitch = allowLoadingLightingScenes;
+
+#if UNITY_EDITOR
+            // Else, we'd be using the Edit mode switch.
+            if(!EditorApplication.isPlaying)
+                usePlaymodeSwitch = false;
+#endif
+            //SceneManager.LoadSceneAsync(data.geometrySceneName);
+            //yield return null;
+
+            if(usePlaymodeSwitch)
+            {
+                AsyncOperation unloadOp = null;
+                AsyncOperation loadOp = null;
+
+                // TODO lighting scenes are the following ones, the geometry scenes are the first one.
+                if(SceneManager.sceneCount > 1)
+                {
+                    unloadOp = SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(1));
+
+                    while(!unloadOp.isDone)
+                        yield return null;
+                }
+
+                if(!string.IsNullOrEmpty(data.lightingSceneName))
+                {
+                    loadOp = SceneManager.LoadSceneAsync(data.lightingSceneName, LoadSceneMode.Additive);
+
+                    while(!loadOp.isDone)
+                        yield return null;
+
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(data.lightingSceneName));
+                }
+            }
+
+            if(data.storeRendererInfos)
+                ApplyDataRendererInfo(data.rendererInfos);
+
+            LightmapSettings.lightmaps = LoadLightmaps(data);
+
+            LoadLightProbes(data);
         }
 
-        LightmapSettings.lightmaps = LoadLightmaps(data);
+        LightmapSettings.lightmapsMode = data.lightmapsMode;
 
-        LoadLightProbes(data);
+        StartCoroutine(ReconfigureScenes(data));
     }
 
 

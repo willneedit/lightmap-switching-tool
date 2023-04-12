@@ -100,20 +100,11 @@ public class LightingScenarioEditor : Editor
             return;
         }
 
-        if(scenarioData.geometrySceneName == "" )
+        if(string.IsNullOrEmpty(scenarioData.geometrySceneName))
         {
             Debug.LogError("Geometry scene name cannot be null. Stopping generation.");
             return;
         }
-        if (scenarioData.lightingSceneName == "")
-        {
-            Debug.LogError("Lighting scene name cannot be null. Stopping generation.");
-            return;
-        }
-        string lightingSceneGUID = AssetDatabase.FindAssets(scenarioData.lightingSceneName)[0];
-        string lightingScenePath = AssetDatabase.GUIDToAssetPath(lightingSceneGUID);
-        if (!lightingScenePath.EndsWith(".unity"))
-            lightingScenePath += ".unity";
 
         string geometrySceneGUID = AssetDatabase.FindAssets(scenarioData.geometrySceneName)[0];
         string geometryScenePath = AssetDatabase.GUIDToAssetPath(geometrySceneGUID);
@@ -121,10 +112,19 @@ public class LightingScenarioEditor : Editor
             geometryScenePath += ".unity";
 
         EditorSceneManager.OpenScene(geometryScenePath);
-        Lightmapping.lightingDataAsset = null;
-        EditorSceneManager.OpenScene(lightingScenePath, OpenSceneMode.Additive);
-        Scene lightingScene = SceneManager.GetSceneByName(scenarioData.lightingSceneName);
-        EditorSceneManager.SetActiveScene(lightingScene);
+
+        if (!string.IsNullOrEmpty(scenarioData.lightingSceneName))
+        {
+            string lightingSceneGUID = AssetDatabase.FindAssets(scenarioData.lightingSceneName)[0];
+            string lightingScenePath = AssetDatabase.GUIDToAssetPath(lightingSceneGUID);
+            if(!lightingScenePath.EndsWith(".unity"))
+                lightingScenePath += ".unity";
+
+            Lightmapping.lightingDataAsset = null;
+            EditorSceneManager.OpenScene(lightingScenePath, OpenSceneMode.Additive);
+            Scene lightingScene = SceneManager.GetSceneByName(scenarioData.lightingSceneName);
+            EditorSceneManager.SetActiveScene(lightingScene);
+        }
     }
 
     private IEnumerator BuildLightingAsync(LightingScenarioData scenarioData)
