@@ -1,4 +1,8 @@
-ProjectSettings/UnityConnectSettings.asset
+.vsconfig
+ProjectSettings/
+UserSettings/
+Packages/packages-lock.json
+
 Library
 Temp
 

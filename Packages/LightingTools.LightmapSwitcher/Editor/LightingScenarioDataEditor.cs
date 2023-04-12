@@ -34,6 +34,27 @@ public class LightingScenarioEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        IEnumerator EditorGenerateLightingScenarioData(LightingScenarioData scenarioData)
+        {
+            yield return null;
+
+            LoadLightingScenarioScenes(scenarioData);
+            //Check if the lighting scene needs requires dynamic lighting ( if not, never try to load the lighting scene ).
+            scenarioData.hasRealtimeLights = SearchLightsNeededRealtime();
+            Debug.Log("Lightmap switcher - Start baking");
+            //Remove reference to LightingDataAsset so that Unity doesn't delete the previous bake
+            Lightmapping.lightingDataAsset = null;
+            EditorCoroutineUtility.StartCoroutine(BuildLightingAsync(scenarioData), this);
+        }
+
+        IEnumerator EditorLoadLightingScenario(LightingScenarioData scenarioData)
+        {
+            yield return null;
+
+            LoadLightingScenarioScenes(scenarioData);
+            GameObject.FindObjectOfType<LevelLightmapData>().LoadLightingScenarioData(scenarioData);
+        }
+
         serializedObject.Update();
         EditorGUILayout.PropertyField(geometrySceneName);
         EditorGUILayout.PropertyField(lightingSceneName);
@@ -55,20 +76,10 @@ public class LightingScenarioEditor : Editor
         LightingScenarioData scenarioData = (LightingScenarioData)target;
 
         if (GUILayout.Button("Generate lighting scenario data"))
-        {
-            LoadLightingScenarioScenes(scenarioData);
-            //Check if the lighting scene needs requires dynamic lighting ( if not, never try to load the lighting scene ).
-            scenarioData.hasRealtimeLights = SearchLightsNeededRealtime();
-            Debug.Log("Lightmap switcher - Start baking");
-            //Remove reference to LightingDataAsset so that Unity doesn't delete the previous bake
-            Lightmapping.lightingDataAsset = null;
-            EditorCoroutineUtility.StartCoroutine(BuildLightingAsync(scenarioData), this);
-        }
+            EditorCoroutineUtility.StartCoroutine(EditorGenerateLightingScenarioData(scenarioData), this);
+
         if (GUILayout.Button("Load Lighting scenario"))
-        {
-            LoadLightingScenarioScenes(scenarioData);
-            GameObject.FindObjectOfType<LevelLightmapData>().LoadLightingScenarioData(scenarioData);
-        }
+            EditorCoroutineUtility.StartCoroutine(EditorLoadLightingScenario(scenarioData), this);
 
         serializedObject.ApplyModifiedProperties();
     }
@@ -83,6 +94,12 @@ public class LightingScenarioEditor : Editor
 
         Debug.Log("Loading scenario " + scenarioData.name);
 
+        if(EditorApplication.isPlaying)
+        {
+            Debug.LogWarning("Skipping scene loading for the play mode.");
+            return;
+        }
+
         if(scenarioData.geometrySceneName == "" )
         {
             Debug.LogError("Geometry scene name cannot be null. Stopping generation.");
@@ -96,12 +113,12 @@ public class LightingScenarioEditor : Editor
         string lightingSceneGUID = AssetDatabase.FindAssets(scenarioData.lightingSceneName)[0];
         string lightingScenePath = AssetDatabase.GUIDToAssetPath(lightingSceneGUID);
         if (!lightingScenePath.EndsWith(".unity"))
-            lightingScenePath = lightingScenePath + ".unity";
+            lightingScenePath += ".unity";
 
         string geometrySceneGUID = AssetDatabase.FindAssets(scenarioData.geometrySceneName)[0];
         string geometryScenePath = AssetDatabase.GUIDToAssetPath(geometrySceneGUID);
         if (!geometryScenePath.EndsWith(".unity"))
-            geometryScenePath = geometryScenePath + ".unity";
+            geometryScenePath += ".unity";
 
         EditorSceneManager.OpenScene(geometryScenePath);
         Lightmapping.lightingDataAsset = null;
@@ -128,8 +145,8 @@ public class LightingScenarioEditor : Editor
     {
         bool latestBuildHasRealtimeLights = false;
 
-        var lights = FindObjectsOfType<Light>();
-        var reflectionProbes = FindObjectsOfType<ReflectionProbe>();
+        Light[] lights = FindObjectsOfType<Light>();
+        ReflectionProbe[] reflectionProbes = FindObjectsOfType<ReflectionProbe>();
 
         foreach (Light light in lights)
         {
@@ -149,7 +166,7 @@ public class LightingScenarioEditor : Editor
         GenerateLightingData(scenarioData);
         if (scenarioData.lightProbesAsset == null)
         {
-            var probes = ScriptableObject.CreateInstance<LightProbesAsset>();
+            LightProbesAsset probes = ScriptableObject.CreateInstance<LightProbesAsset>();
             string path = AssetDatabase.GetAssetPath(scenarioData);
             if (path == "")
             {
@@ -177,10 +194,10 @@ public class LightingScenarioEditor : Editor
 
     static void GenerateLightingData(LightingScenarioData data)
     {
-        var newRendererInfos = new List<LevelLightmapData.RendererInfo>();
-        var newLightmapsLight = new List<Texture2D>();
-        var newLightmapsDir = new List<Texture2D>();
-        var newLightmapsShadow = new List<Texture2D>();
+        List<LevelLightmapData.RendererInfo> newRendererInfos = new();
+        List<Texture2D> newLightmapsLight = new();
+        List<Texture2D> newLightmapsDir = new();
+        List<Texture2D> newLightmapsShadow = new();
 
         data.lightmapsMode = LightmapSettings.lightmapsMode;
 
@@ -188,8 +205,10 @@ public class LightingScenarioEditor : Editor
         Terrain terrain = FindObjectOfType<Terrain>();
         if (terrain != null && terrain.lightmapIndex != -1 && terrain.lightmapIndex != 65534)
         {
-            LevelLightmapData.RendererInfo terrainRendererInfo = new LevelLightmapData.RendererInfo();
-            terrainRendererInfo.lightmapScaleOffset = terrain.lightmapScaleOffset;
+            LevelLightmapData.RendererInfo terrainRendererInfo = new()
+            {
+                lightmapScaleOffset = terrain.lightmapScaleOffset
+            };
 
             Texture2D lightmaplight = LightmapSettings.lightmaps[terrain.lightmapIndex].lightmapColor;
             terrainRendererInfo.lightmapIndex = newLightmapsLight.IndexOf(lightmaplight);
@@ -228,17 +247,19 @@ public class LightingScenarioEditor : Editor
 
         }
 
-        var renderers = FindObjectsOfType(typeof(Renderer));
+        Renderer[] renderers = FindObjectsOfType<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
             if (renderer.lightmapIndex != -1 && renderer.lightmapIndex != 65534)
             {
-                LevelLightmapData.RendererInfo info = new LevelLightmapData.RendererInfo();
-                info.transformHash = LevelLightmapData.GetStableHash(renderer.gameObject.transform);
-                info.meshHash = renderer.gameObject.GetComponent<MeshFilter>().sharedMesh.vertexCount;
-                info.name = renderer.gameObject.name;
-                info.lightmapScaleOffset = renderer.lightmapScaleOffset;
+                LevelLightmapData.RendererInfo info = new()
+                {
+                    transformHash = LevelLightmapData.GetStableHash(renderer.gameObject.transform),
+                    meshHash = renderer.gameObject.GetComponent<MeshFilter>().sharedMesh.vertexCount,
+                    name = renderer.gameObject.name,
+                    lightmapScaleOffset = renderer.lightmapScaleOffset
+                };
 
                 Texture2D lightmaplight = LightmapSettings.lightmaps[renderer.lightmapIndex].lightmapColor;
                 info.lightmapIndex = newLightmapsLight.IndexOf(lightmaplight);
@@ -268,14 +289,14 @@ public class LightingScenarioEditor : Editor
                         newLightmapsShadow.Add(lightmapShadow);
                     }
                 }
-                if (data.storeRendererInfos)
-                {
-                    newRendererInfos.Add(info);
-                    if (Application.isEditor)
-                        Debug.Log("stored info for " + renderers.Length + " meshrenderers");
-                }
+
+                if(data.storeRendererInfos) newRendererInfos.Add(info);
             }
         }
+
+        if(data.storeRendererInfos && Application.isEditor)
+            Debug.Log("stored info for " + renderers.Length + " meshrenderers");
+
         data.lightmaps = newLightmapsLight.ToArray();
         data.lightmapsDir = newLightmapsDir.ToArray();
         data.shadowMasks = newLightmapsShadow.ToArray();
