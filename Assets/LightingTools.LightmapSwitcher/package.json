@@ -2,7 +2,7 @@
   "name": "li.lightingtools.lightmapswitcher",
   "displayName": "Lightmap Switcher",
   "version": "1.2.1",
-  "unity": "2021.15",
+  "unity": "2021.3",
   "description": "Allows you to switch lightmaps at runtime.",
   "dependencies": {
     "com.unity.editorcoroutines": "0.1.0-preview.1"
