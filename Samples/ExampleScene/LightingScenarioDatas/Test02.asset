@@ -48,3 +48,28 @@ MonoBehaviour:
   lightmapsMode: 1
   lightProbesAsset: {fileID: 11400000, guid: ab0b35fb134f6ad4ea7b223a8fe7707c, type: 2}
   hasRealtimeLights: 1
+  renderSettings:
+    hasRenderSettings: 1
+    ambientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+    ambientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+    ambientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+    ambientIntensity: 1
+    ambientLight: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+    ambientMode: 0
+    defaultReflectionMode: 0
+    defaultReflectionResolution: 128
+    flareFadeSpeed: 3
+    flareStrength: 1
+    fog: 0
+    fogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    fogDensity: 0.01
+    fogEndDistance: 300
+    fogStartDistance: 0
+    fogMode: 3
+    haloStrength: 0.5
+    reflectionBounces: 1
+    reflectionIntensity: 1
+    subtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+    sun: {fileID: 0}
+    customReflection: {fileID: 0}
+    skybox: {fileID: 2100000, guid: a06be3c1401d66e41bbccf0be14ad1ed, type: 2}

@@ -301,5 +301,7 @@ public class LightingScenarioEditor : Editor
         data.lightmapsDir = newLightmapsDir.ToArray();
         data.shadowMasks = newLightmapsShadow.ToArray();
         data.rendererInfos = newRendererInfos.ToArray();
+
+        data.SnapshotRenderSettings();
     }
 }
