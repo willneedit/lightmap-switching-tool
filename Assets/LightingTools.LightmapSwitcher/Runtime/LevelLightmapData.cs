@@ -79,6 +79,9 @@ public class LevelLightmapData : MonoBehaviour
                 }
             }
 
+            if(data.HasRenderSettings)
+                data.RestoreRenderSettings();
+
             if(data.storeRendererInfos)
                 ApplyDataRendererInfo(data.rendererInfos);
 
@@ -206,9 +209,17 @@ public class LevelLightmapData : MonoBehaviour
         {
             try
             {
-                LightmapSettings.lightProbes.bakedProbes = data.lightProbesAsset.lightProbes;
+                // https://forum.unity.com/threads/cannot-set-lightmapsettings-lightprobes-bakedprobes-cannot-create-new-instance-of-lightprobes.1252989/
+                // Swapping the lightProbes don't work at all, I cannot create a new instance.
+                // LightProbes lp = ObjectFactory.CreateInstance<LightProbes>();
+
+                if(LightmapSettings.lightProbes != null)
+                    LightmapSettings.lightProbes.bakedProbes = data.lightProbesAsset.lightProbes;
             }
-            catch { Debug.LogWarning("Warning, error when trying to load lightprobes for scenario " + data.name); }
+            catch(Exception e)
+            {
+                Debug.LogWarning($"{data.name} failed lightprobes loading: {e.Message}");
+            }
         }
     }
     public static int GetStableHash(Transform transform)
