@@ -23,6 +23,12 @@ public class LightingScenarioDataFactory : ScriptableObject
         //Check if the lighting scene needs requires dynamic lighting ( if not, never try to load the lighting scene ).
         scenarioData.hasRealtimeLights = SearchLightsNeededRealtime();
         Debug.Log("Lightmap switcher - Start baking");
+
+        //string ldpath = AssetDatabase.GetAssetPath(Lightmapping.lightingDataAsset);
+        //Debug.Log($"Lighting Data Asset: {ldpath}");
+        //string scpath = EditorSceneManager.GetActiveScene().path;
+        //Debug.Log($"Current scene path: {scpath}");
+
         //Remove reference to LightingDataAsset so that Unity doesn't delete the previous bake
         Lightmapping.lightingDataAsset = null;
         
@@ -33,7 +39,7 @@ public class LightingScenarioDataFactory : ScriptableObject
         OnBakingDone?.Invoke();
     }
 
-    public void LoadLightingScenarioScenes(LightingScenarioData scenarioData)
+    public static void LoadLightingScenarioScenes(LightingScenarioData scenarioData)
     {
         if(UnityEditor.Lightmapping.giWorkflowMode != UnityEditor.Lightmapping.GIWorkflowMode.OnDemand)
         {
@@ -51,8 +57,9 @@ public class LightingScenarioDataFactory : ScriptableObject
 
         if(string.IsNullOrEmpty(scenarioData.geometrySceneName))
         {
-            Debug.LogError("Geometry scene name cannot be null. Stopping generation.");
-            return;
+            Debug.Log("Geometry scene is blank - assuming the first scene as the geometry scene");
+            Scene sc = EditorSceneManager.GetSceneAt(0);
+            scenarioData.geometrySceneName = sc.name;
         }
 
         string geometrySceneGUID = AssetDatabase.FindAssets(scenarioData.geometrySceneName)[0];

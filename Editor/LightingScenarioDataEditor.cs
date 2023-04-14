@@ -34,11 +34,11 @@ public class LightingScenarioEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        IEnumerator EditorLoadLightingScenario(LightingScenarioData scenarioData)
+        static IEnumerator EditorLoadLightingScenario(LightingScenarioData scenarioData)
         {
             yield return null;
 
-            LoadLightingScenarioScenes(scenarioData);
+            LightingScenarioDataFactory.LoadLightingScenarioScenes(scenarioData);
             GameObject.FindObjectOfType<LevelLightmapData>().LoadLightingScenarioData(scenarioData);
         }
 
@@ -75,48 +75,4 @@ public class LightingScenarioEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }
-
-    public void LoadLightingScenarioScenes(LightingScenarioData scenarioData)
-    {
-        if (UnityEditor.Lightmapping.giWorkflowMode != UnityEditor.Lightmapping.GIWorkflowMode.OnDemand)
-        {
-            Debug.LogError("Lightmap switcher requires Auto Generate lighting mode disabled.");
-            return;
-        }
-
-        Debug.Log("Loading scenario " + scenarioData.name);
-
-        if(EditorApplication.isPlaying)
-        {
-            Debug.LogWarning("Skipping scene loading for the play mode.");
-            return;
-        }
-
-        if(string.IsNullOrEmpty(scenarioData.geometrySceneName))
-        {
-            Debug.LogError("Geometry scene name cannot be null. Stopping generation.");
-            return;
-        }
-
-        string geometrySceneGUID = AssetDatabase.FindAssets(scenarioData.geometrySceneName)[0];
-        string geometryScenePath = AssetDatabase.GUIDToAssetPath(geometrySceneGUID);
-        if (!geometryScenePath.EndsWith(".unity"))
-            geometryScenePath += ".unity";
-
-        EditorSceneManager.OpenScene(geometryScenePath);
-
-        if (!string.IsNullOrEmpty(scenarioData.lightingSceneName))
-        {
-            string lightingSceneGUID = AssetDatabase.FindAssets(scenarioData.lightingSceneName)[0];
-            string lightingScenePath = AssetDatabase.GUIDToAssetPath(lightingSceneGUID);
-            if(!lightingScenePath.EndsWith(".unity"))
-                lightingScenePath += ".unity";
-
-            Lightmapping.lightingDataAsset = null;
-            EditorSceneManager.OpenScene(lightingScenePath, OpenSceneMode.Additive);
-            Scene lightingScene = SceneManager.GetSceneByName(scenarioData.lightingSceneName);
-            EditorSceneManager.SetActiveScene(lightingScene);
-        }
-    }
-
 }
